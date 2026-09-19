@@ -1,0 +1,106 @@
+# revit-api-kb — cloud build pipeline
+#
+# Everything (clone → extract → vault → site) runs HERE, on GitHub, so the
+# local machine never downloads the 1 GB CHM corpus or the 2 GB TBC archive.
+#
+# Required: Settings → Pages → Source = "GitHub Actions".
+# Outputs : data/*.json committed back, site/ published to Pages.
+
+name: build
+
+on:
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: "Revit versions to extract (space separated)"
+        default: "2023 2024"
+      max_posts:
+        description: "Cap TBC posts fetched (0 = all matched)"
+        default: "0"
+  schedule:
+    - cron: "0 4 1 * *"   # 04:00 UTC on the 1st of each month
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Extract Revit API signatures
+        run: |
+          python scripts/build_signature_db.py \
+            --fetch \
+            --versions ${{ github.event.inputs.versions || '2023 2024' }} \
+            --out-dir data
+
+      - name: Harvest The Building Coder notes
+        run: |
+          python scripts/build_tbc_notes.py \
+            --out-dir data \
+            --max-posts ${{ github.event.inputs.max_posts || '0' }}
+
+      - name: Build vault + static site
+        run: |
+          python scripts/build_vault.py --data-dir data --vault vault --site site
+
+      - name: Sanity check
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          ok = True
+          for name in sorted(os.listdir("data")):
+              if name.startswith("api_"):
+                  db = json.load(open(f"data/{name}", encoding="utf-8"))
+                  c = db.get("counts", {})
+                  print(name, c)
+                  if c.get("types", 0) < 800 or c.get("members", 0) < 8000:
+                      print(f"  !! {name} looks truncated")
+                      ok = False
+          if not os.path.isfile("site/index.html"):
+              print("!! missing site/index.html"); ok = False
+          sys.exit(0 if ok else 1)
+          PY
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Commit data + vault back to the repo
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data vault
+          if git diff --cached --quiet; then
+            echo "no changes to commit"
+          else
+            git commit -m "chore: rebuild knowledge base $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

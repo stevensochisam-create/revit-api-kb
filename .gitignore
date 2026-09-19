@@ -1,0 +1,9 @@
+# Local corpus is never committed (built in GitHub Actions instead)
+chms/
+tbc/
+__pycache__/
+*.pyc
+.venv/
+
+# Transient build scratch
+data/*.tmp
