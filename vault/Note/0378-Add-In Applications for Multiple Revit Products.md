@@ -1,0 +1,22 @@
+---
+num: 378
+date: 2010-06-01
+themes: [MEP]
+tags: [revit-api, tbc]
+---
+
+# Add-In Applications for Multiple Revit Products
+
+<https://jeremytammik.github.io/tbc/a/0378_multi_flavour_apps.htm>
+
+```csharp
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot;?&gt; &lt;RevitAddIns&gt; &nbsp; &lt;AddIn Type=&quot;Application&quot;&gt; &nbsp; &nbsp; &lt;Assembly&gt;C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll&lt;/Assembly&gt; &nbsp; &nbsp; &lt;ClientId&gt;2ec9c787-d029-460b-8fd9-003ec80254ab&lt;/ClientId&gt; &nbsp; &nbsp; &lt;FullClassName&gt;HA.ApplicationLoader.EventManager&lt;/FullClassName&gt; &nbsp; &nbsp; &lt;Name&gt;Global Event Manager&lt;/Name&gt; &nbsp; &lt;/AddIn&gt; &nbsp; &lt;AddIn Type=&quot;Application&quot;&gt; &nbsp; &nbsp; &lt;Assembly&gt;C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll&lt;/Assembly&gt; &nbsp; &nbsp; &lt;ClientId&gt;44e53d5e-3b1d-4eb9-a29c-18c93f86ad04&lt;/ClientId&gt; &nbsp; &nbsp; &lt;FullClassName&gt;HA.ApplicationLoader.HaLoader&lt;/FullClassName&gt; &nbsp; &nbsp; &lt;Name&gt;Global Commands&lt;/Name&gt; &nbsp; &lt;/AddIn&gt; &nbsp; &lt;AddIn Type=&quot;Application&quot;&gt; &nbsp; &nbsp; &lt;Assembly&gt;C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll&lt;/Assembly&gt; &nbsp; &nbsp; &lt;ClientId&gt;f7ae3726-1987-40df-9aa5-225aa1e9c95f&lt;/ClientId&gt; &nbsp; &nbsp; &lt;FullClassName&gt;HA.ApplicationLoader.ElectricalLoader&lt;/FullClassName&gt; &nbsp; &nbsp; &lt;Name&gt;Electrical Commands&lt;/Name&gt; &nbsp; &lt;/AddIn&gt; &nbsp; &lt;AddIn Type=&quot;Application&quot;&gt; &nbsp; &nbsp; &lt;Assembly&gt;C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll&lt;/Assembly&gt; &nbsp; &nbsp; &lt;ClientId&gt;7d43fa76-f249-4453-9bd5-91b7601fb486&lt;/ClientId&gt; &nbsp; &nbsp; &lt;FullClassName&gt;HA.ApplicationLoader.HvacLoader&lt;/FullClassName&gt; &nbsp; &nbsp; &lt;Name&gt;HVAC Commands&lt;/Name&gt; &nbsp; &lt;/AddIn&gt; &nbsp; &lt;AddIn Type=&quot;Application&quot;&gt; &nbsp; &nbsp; &lt;Assembly&gt;C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll&lt;/Assembly&gt; &nbsp; &nbsp; &lt;ClientId&gt;a5b99559-a5ff-4fb5-863e-3031e5e715a2&lt;/ClientId&gt; &nbsp; &nbsp; &lt;FullClassName&gt;HA.ApplicationLoader.LifeSafetyLoader&lt;/FullClassName&gt; &nbsp; &nbsp; &lt;Name&gt;Life Safety Commands&lt;/Name&gt; &nbsp; &lt;/AddIn&gt; &nbsp; &lt;AddIn Type=&quot;Application&quot;&gt; &nbsp; &nbsp; &lt;Assembly&gt;C:\Program Files\HA Programs\Revit 2011 AddIns\HA.ApplicationLoader.dll&lt;/Assembly&gt; &
+```
+
+```csharp
+public Result OnStartup( &nbsp; UIControlledApplication uiControlledApp ) { &nbsp; try &nbsp; { &nbsp; &nbsp; // add code here to load custom commands &nbsp; &nbsp; // and build the Ribbon Panel &nbsp; &nbsp; &nbsp; return Result.Succeeded; &nbsp; } &nbsp; catch( Exception e ) &nbsp; { &nbsp; &nbsp; ErrorMsg( e.Message ); &nbsp; } &nbsp; return Result.Failed; }
+```
+
+```csharp
+public Result OnStartup( &nbsp; UIControlledApplication uiControlledApp ) { &nbsp; Result rc = Result.Failed; &nbsp; &nbsp; try &nbsp; { &nbsp; &nbsp; // Control the loading of the AddIn &nbsp; &nbsp; // based on the product we are running &nbsp; &nbsp; &nbsp; ProductType pt = uiControlledApp &nbsp; &nbsp; &nbsp; .ControlledApplication.Product; &nbsp; &nbsp; &nbsp; // always check this &nbsp; &nbsp; &nbsp; if( pt == ProductType.Unknown ) &nbsp; &nbsp; { &nbsp; &nbsp; &nbsp; return Result.Cancelled; &nbsp; &nbsp; } &nbsp; &nbsp; &nbsp; // we must be in RAC to continue. &nbsp; &nbsp; // Comment out if running MEP or RST &nbsp; &nbsp; &nbsp; //if( pt != ProductType.Architecture) &nbsp; &nbsp; //{ &nbsp; &nbsp; // return Result.Cancelled; &nbsp; &nbsp; //} &nbsp; &nbsp; &nbsp; // we must be in MEP to continue. &nbsp; &nbsp; // Comment out if running RAC or RST &nbsp; &nbsp; &nbsp; if( pt != ProductType.MEP ) &nbsp; &nbsp; { &nbsp; &nbsp; &nbsp; return Result.Cancelled; &nbsp; &nbsp; } &nbsp; &nbsp; &nbsp; // we must be in RST to continue. &nbsp; &nbsp; // Comment out if running RAC or MEP &nbsp; &nbsp; &nbsp; //if(pt != ProductType.Structure) &nbsp; &nbsp; //{ &nbsp; &nbsp; // return Result.Cancelled; &nbsp; &nbsp; //} &nbsp; &nbsp; &nbsp; // add code here to load custom commands &nbsp; &nbsp; // and build the Ribbon Panel &nbsp; &nbsp; &nbsp; return Result.Succeeded; &nbsp; } &nbsp; catch( Exception e ) &nbsp; { &nbsp; &nbsp; ErrorMsg( e.Message ); &nbsp; } &nbsp; return Result.Failed; }
+```

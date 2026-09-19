@@ -1,0 +1,18 @@
+---
+type: PlanCircuitSetIterator
+namespace: Autodesk.Revit.DB
+version: 2024
+members: 4
+tags: [revit-api, class]
+---
+
+# PlanCircuitSetIterator
+
+`Autodesk.Revit.DB.PlanCircuitSetIterator` · Revit 2024 · 4 members
+
+| Kind | Member | Since | Signature |
+| --- | --- | --- | --- |
+| Constructor | PlanCircuitSetIterator | — | `public PlanCircuitSetIterator ()` |
+| Method | MoveNext | — | `public virtual bool MoveNext ()` |
+| Method | Reset | — | `public virtual void Reset ()` |
+| Property | Current | — | `public virtual Object Current { get ; }` |

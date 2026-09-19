@@ -1,0 +1,30 @@
+---
+num: 2072
+date: 2025-04-02
+themes: [Pitfall, VersionMigration]
+tags: [revit-api, tbc]
+---
+
+# Revit 2026, Empty Assets and Demolished Stuff
+
+<https://jeremytammik.github.io/tbc/a/2072_empty_asset.html>
+
+```csharp
+--> Click for animation --> Revit 2026, Empty Assets and Demolished Stuff The new major release of Revit has arrived, and a bunch of API solutions for the existing ones: What's new in Revit 2026 Empty appearance asset element Retrieving demolished room data RST results package creation RST ResultsBuilder SDK sample What's New in Revit 2026 Autodesk has released Revit 2026, cf. What's New in Revit 2026. For an intro to the new features, you can register for the What’s New in Revit 2026 webinar on April 10. Before going further with that, let's look at some recent solutions for programming the existing releases. Empty Appearance Asset Element The Revit API discussion forum thread on why is AppearanceAssetElement empty in API was solved: Question: I am retrieving appearance assets from elements in my project and came across a door which has a material Door - Architrave. Even though it has appearance assets in the UI, RevitLookup cannot find them. It shows AssetProperties.Size = 0. This is the only material in my entire project with zero AssetProperties.Size. Is this normal? How else can I get my Appearance assets if AssetProperties.Size is zero? I'm trying to get specific appearance asset properties from various materials, including appearance description, category and main appearance image filepath. I tried using renderingAsset.FindByName("Description"), renderingAsset.FindByName("Category"), renderingAsset.FindByName("UnifiedBitmapSchema") and renderingAsset.FindByName("BaseSchema"). They all return null since renderingAssets is empty, i.e. AssetProperties.Size = 0. For reference, here is my code: private (string, string, string) GetMaterialAssets(Document doc, int materialId) { string texturePath = ""; string description = ""; string category = ""; // Get material element Material material = doc.GetElement(new ElementId(materialId)) as Material; if (material != null) { // Get appearance assets ElementId appearanceAssetId = material.AppearanceAssetId; AppearanceAssetElement appearanceAssetElem = doc.GetElement(appearanceAssetId) as AppearanceAssetElement; if (appearanceAssetElem == null) return (texturePath, description, category); // Get rendering asset Asset assetRend = appearanceAssetElem.GetRenderingAsset(); if (assetRend != null) { if (assetRend.Size == 0) { AssetProperty baseSchema = assetRend.FindByName("BaseSchema"); TaskDialog.Show("Base Schema", bas
+```
+
+```csharp
+// Get the active document and UIDocument from the commandData Document doc = commandData.Application.ActiveUIDocument.Document; UIDocument uidoc = commandData.Application.ActiveUIDocument; // Retrieve all project phases (assuming 3 phases: "Existing", "New Construction", "Final Phase") FilteredElementCollector phaseCollector = new FilteredElementCollector(doc) .OfCategory(BuiltInCategory.OST_Phases) .WhereElementIsNotElementType(); // Find the specific phases by name Phase existingPhase=phaseCollector.FirstOrDefault(phase=>phase.Name=="Existing") as Phase; Phase newConstructionPhase=phaseCollector.FirstOrDefault(phase=>phase.Name=="New Construction") as Phase; Phase finalPhase=phaseCollector.FirstOrDefault(phase=>phase.Name=="Final Phase") as Phase; // Let the user pick an element (family instance) from the Revit model Autodesk.Revit.DB.Reference pickedReference = uidoc.Selection.PickObject(ObjectType.Element); Element pickedElement = doc.GetElement(pickedReference); FamilyInstance familyInstance = pickedElement as FamilyInstance; if (familyInstance != null) { // Room in which the family instance is located during the final phase of the project Room currentRoom = familyInstance.Room; // Access the room the family instance is located in, based on a specific phase // Modify this to set the desired phase: existingPhase, newConstructionPhase, or finalPhase Phase targetPhase = existingPhase; Room roomInSpecificPhase = familyInstance.get_Room(targetPhase); // Workaround: Get the family instance's location point //and find the corresponding room in the specified phase. LocationPoint familyLocation = familyInstance.Location as LocationPoint; if (familyLocation != null) { XYZ locationPoint = familyLocation.Point; Room roomAtPoint = doc.GetRoomAtPoint(locationPoint, targetPhase); } }
+```
+
+```csharp
+// Create a filtered collector to gather all Phase elements in the document FilteredElementCollector collector = new FilteredElementCollector(doc) .OfCategory(BuiltInCategory.OST_Phases) .WhereElementIsNotElementType(); using (Transaction actrans = new Transaction(doc, "Create View Schedules")) { actrans.Start(); foreach (Element e in collector) { Phase phase = e as Phase; if (phase != null) { // Create a view schedule for the each phase CreateViewSchedule(doc ,phase); } } actrans.Commit(); } private void CreateViewSchedule(Document doc , Phase phase) { // Create a new view schedule in the document //with an InvalidElementId for a multi-category schedule ViewSchedule viewSchedule = ViewSchedule.CreateSchedule(doc, ElementId.InvalidElementId); // Set the name of the schedule viewSchedule.Name = "API-" + phase.Name; // Set the phase parameter of the view schedule to the required phase viewSchedule.get_Parameter(BuiltInParameter.VIEW_PHASE).Set(phase.Id); ScheduleDefinition definition = viewSchedule.Definition; // Loop through all schedulable fields and add them to the schedule definition foreach (SchedulableField sf in definition.GetSchedulableFields()) { ScheduleField field = definition.AddField(sf); } }
+```
+
+```csharp
+AnalyticalModel analyticalModel = (doc.GetElement(elementId) as AnalyticalModel); IList&lt;Curve&gt; curves = analyticalModel.GetCurves(AnalyticalCurveType.RawCurves);
+```
+
+```csharp
+AnalyticalPanel analyticalModel = (doc.GetElement(elementId) as AnalyticalPanel); IList&lt;Curve&gt; curves = analyticalModel.GetOuterContour().ToList();
+```

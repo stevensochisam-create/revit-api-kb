@@ -1,0 +1,100 @@
+{
+ "nodes": [
+  {
+   "id": "v2023",
+   "type": "text",
+   "text": "# Revit 2023",
+   "x": 0,
+   "y": 0,
+   "width": 260,
+   "height": 90
+  },
+  {
+   "id": "v2024",
+   "type": "text",
+   "text": "# Revit 2024",
+   "x": 320,
+   "y": 0,
+   "width": 260,
+   "height": 90
+  },
+  {
+   "id": "p0",
+   "type": "text",
+   "text": "# Pitfall\\nElementId",
+   "x": 0,
+   "y": 240,
+   "width": 200,
+   "height": 90
+  },
+  {
+   "id": "p1",
+   "type": "text",
+   "text": "# Pitfall\\nForgeTypeId",
+   "x": 220,
+   "y": 240,
+   "width": 200,
+   "height": 90
+  },
+  {
+   "id": "p2",
+   "type": "text",
+   "text": "# Pitfall\\nToposolid",
+   "x": 440,
+   "y": 240,
+   "width": 200,
+   "height": 90
+  },
+  {
+   "id": "p3",
+   "type": "text",
+   "text": "# Pitfall\\nTransaction",
+   "x": 660,
+   "y": 240,
+   "width": 200,
+   "height": 90
+  }
+ ],
+ "edges": [
+  {
+   "id": "e0_0",
+   "fromNode": "v2023",
+   "toNode": "p0"
+  },
+  {
+   "id": "e1_0",
+   "fromNode": "v2024",
+   "toNode": "p0"
+  },
+  {
+   "id": "e0_1",
+   "fromNode": "v2023",
+   "toNode": "p1"
+  },
+  {
+   "id": "e1_1",
+   "fromNode": "v2024",
+   "toNode": "p1"
+  },
+  {
+   "id": "e0_2",
+   "fromNode": "v2023",
+   "toNode": "p2"
+  },
+  {
+   "id": "e1_2",
+   "fromNode": "v2024",
+   "toNode": "p2"
+  },
+  {
+   "id": "e0_3",
+   "fromNode": "v2023",
+   "toNode": "p3"
+  },
+  {
+   "id": "e1_3",
+   "fromNode": "v2024",
+   "toNode": "p3"
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+---
+type: PlanTopologySet
+namespace: Autodesk.Revit.DB
+version: 2024
+members: 10
+tags: [revit-api, class]
+---
+
+# PlanTopologySet
+
+`Autodesk.Revit.DB.PlanTopologySet` · Revit 2024 · 10 members
+
+| Kind | Member | Since | Signature |
+| --- | --- | --- | --- |
+| Constructor | PlanTopologySet | — | `public PlanTopologySet ()` |
+| Method | Clear | — | `public virtual void Clear ()` |
+| Method | Contains | — | `public virtual bool Contains ( PlanTopology item )` |
+| Method | Erase | — | `public virtual int Erase ( PlanTopology item )` |
+| Method | ForwardIterator | — | `public virtual PlanTopologySetIterator ForwardIterator ()` |
+| Method | GetEnumerator | — | `public virtual IEnumerator GetEnumerator ()` |
+| Method | Insert | — | `public virtual bool Insert ( PlanTopology item )` |
+| Method | ReverseIterator | — | `public virtual PlanTopologySetIterator ReverseIterator ()` |
+| Property | IsEmpty | — | `public virtual bool IsEmpty { get ; }` |
+| Property | Size | — | `public virtual int Size { get ; }` |

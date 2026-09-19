@@ -1,0 +1,18 @@
+---
+num: 398
+date: 2010-06-23
+themes: [MEP]
+tags: [revit-api, tbc]
+---
+
+# Retrieve MEP Elements and Connectors
+
+<https://jeremytammik.github.io/tbc/a/0398_retrieve_mep_elements.htm>
+
+```csharp
+static FilteredElementCollector GetConnectorElements( &nbsp; Document doc, &nbsp; bool include_wires ) { &nbsp; // what categories of family instances &nbsp; // are we interested in? &nbsp; &nbsp; BuiltInCategory[] bics = new BuiltInCategory[] { &nbsp; &nbsp; //BuiltInCategory.OST_CableTray, &nbsp; &nbsp; BuiltInCategory.OST_CableTrayFitting, &nbsp; &nbsp; //BuiltInCategory.OST_Conduit, &nbsp; &nbsp; BuiltInCategory.OST_ConduitFitting, &nbsp; &nbsp; //BuiltInCategory.OST_DuctCurves, &nbsp; &nbsp; BuiltInCategory.OST_DuctFitting, &nbsp; &nbsp; BuiltInCategory.OST_DuctTerminal, &nbsp; &nbsp; BuiltInCategory.OST_ElectricalEquipment, &nbsp; &nbsp; BuiltInCategory.OST_ElectricalFixtures, &nbsp; &nbsp; BuiltInCategory.OST_LightingDevices, &nbsp; &nbsp; BuiltInCategory.OST_LightingFixtures, &nbsp; &nbsp; BuiltInCategory.OST_MechanicalEquipment, &nbsp; &nbsp; //BuiltInCategory.OST_PipeCurves, &nbsp; &nbsp; BuiltInCategory.OST_PipeFitting, &nbsp; &nbsp; BuiltInCategory.OST_PlumbingFixtures, &nbsp; &nbsp; BuiltInCategory.OST_SpecialityEquipment, &nbsp; &nbsp; BuiltInCategory.OST_Sprinklers, &nbsp; &nbsp; //BuiltInCategory.OST_Wire, &nbsp; }; &nbsp; &nbsp; IList&lt;ElementFilter&gt; a &nbsp; &nbsp; = new List&lt;ElementFilter&gt;( bics.Count() ); &nbsp; &nbsp; foreach( BuiltInCategory bic in bics ) &nbsp; { &nbsp; &nbsp; a.Add( new ElementCategoryFilter( bic ) ); &nbsp; } &nbsp; &nbsp; LogicalOrFilter categoryFilter &nbsp; &nbsp; = new LogicalOrFilter( a ); &nbsp; &nbsp; LogicalAndFilter familyInstanceFilter &nbsp; &nbsp; = new LogicalAndFilter( categoryFilter, &nbsp; &nbsp; &nbsp; new ElementClassFilter( &nbsp; &nbsp; &nbsp; &nbsp; typeof( FamilyInstance ) ) ); &nbsp; &nbsp; IList&lt;ElementFilter&gt; b &nbsp; &nbsp; = new List&lt;ElementFilter&gt;( 6 ); &nbsp; &nbsp; b.Add( new ElementClassFilter( typeof( CableTray ) ) ); &nbsp; b.Add( new ElementClassFilter( typeof( Conduit ) ) ); &nbsp; b.Add( new ElementClassFilter( typeof( Duct ) ) ); &nbsp; b.Add( new ElementClassFilter( typeof( Pipe ) ) ); &nbsp; &nbsp; if( include_wires ) &nbsp; { &nbsp; &nbsp; b.Add( new ElementClassFilter( typeof( Wire ) ) ); &nbsp; } &nbsp; b.Add( familyInstanceFilter ); &nbsp; &nbsp; LogicalOrFilter classFilter &nbsp; &nbsp; = new LogicalOrFilter( b ); &nbsp; &nbsp; FilteredElementCollector collector &nbsp; &nbsp; = new FilteredElementCollector( doc ); &nbsp; &nbsp; collector.WherePasses( 
+```
+
+```csharp
+static ConnectorSet GetConnectors( Element e ) { &nbsp; ConnectorSet connectors = null; &nbsp; &nbsp; if( e is FamilyInstance ) &nbsp; { &nbsp; &nbsp; MEPModel m = ( ( FamilyInstance ) e ).MEPModel; &nbsp; &nbsp; &nbsp; if( null != m &nbsp; &nbsp; &nbsp; &amp;&amp; null != m.ConnectorManager ) &nbsp; &nbsp; { &nbsp; &nbsp; &nbsp; connectors = m.ConnectorManager.Connectors; &nbsp; &nbsp; } &nbsp; } &nbsp; else if( e is Wire ) &nbsp; { &nbsp; &nbsp; connectors = ( ( Wire ) e ) &nbsp; &nbsp; &nbsp; .ConnectorManager.Connectors; &nbsp; } &nbsp; else &nbsp; { &nbsp; &nbsp; Debug.Assert( &nbsp; &nbsp; &nbsp; e.GetType().IsSubclassOf( typeof( MEPCurve ) ), &nbsp; &nbsp; &nbsp; &quot;expected all candidate connector provider &quot; &nbsp; &nbsp; &nbsp; + &quot;elements to be either family instances or &quot; &nbsp; &nbsp; &nbsp; + &quot;derived from MEPCurve&quot; ); &nbsp; &nbsp; &nbsp; if( e is MEPCurve ) &nbsp; &nbsp; { &nbsp; &nbsp; &nbsp; connectors = ( ( MEPCurve ) e ) &nbsp; &nbsp; &nbsp; &nbsp; .ConnectorManager.Connectors; &nbsp; &nbsp; } &nbsp; } &nbsp; return connectors; }
+```
