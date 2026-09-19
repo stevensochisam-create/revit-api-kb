@@ -100,7 +100,7 @@ def fetch_chms(dest: str, versions: List[str], shallow_filter: bool = True) -> s
     if shallow_filter:
         patterns = []
         for version in versions:
-            patterns += [f"html/{version}/RevitAPI.hhc", f"html/{version}/html"]
+            patterns += [f"html/{version}"]
         code, out = _run(["git", "sparse-checkout", "set"] + patterns, cwd=repo)
         if code != 0:
             raise RuntimeError(f"sparse-checkout failed ({code}): {out[-2000:]}")
